@@ -1,0 +1,67 @@
+% Another simple example of how to use the module.
+% Google charts uses & as a separtor. This shows how to define a transformation
+% that uses & as a separator
+\usemodule[webfilter]
+
+\startluacode
+  userdata = userdata or {}
+  userdata.webfilter = userdata.webfilter or {}
+
+  local http  = require("socket.http")
+  local ltn12 = require("ltn12")
+  local url   = require("socket.url")
+
+  function userdata.webfilter.websequence(name) 
+    local content   = buffers.getcontent(name)
+    local style    = "modern-blue" 
+    local body     = "style=" .. style .. "&message=" .. url.escape(content)
+    local response = {}
+    local status, message = http.request {
+      method = 'POST',
+      url    = "http://www.websequencediagrams.com",
+      source = ltn12.source.string(body),
+      sink   = ltn12.sink.table(response),
+      headers = {
+        ["Content-Length"] = string.len(body),
+      },
+    }
+
+    -- ConTeXt does not have a JSON parser. So, we do a quick and 
+    -- dirty parsing.
+    local quot  = lpeg.P('"') 
+    local other = 1 - quot
+
+    local img = other^0 * quot * lpeg.Cs(other^0) * quot * other 
+
+    local location = lpeg.match(img,response[1])
+    return location
+  end
+\stopluacode
+
+\defineexternalfigure[websequence][width=\textwidth,maxheight=\textheight,method=png]
+
+\definewebfilter
+  [websequence]
+  [prefix={http://www.websequencediagrams.com/},
+   transform=userdata.webfilter.websequence,
+   figuresetup=websequence]
+
+\enabletrackers[third.externalfilter]
+\enabletrackers[resolvers.schemes]
+
+\starttext
+  \startwebsequence
+    Card Holder->ATM: select withdrawal options
+    Card Holder->ATM: Specify amount
+    ATM->Bank: Check availability of funds
+    ATM->ATM: Eject card
+    ATM->Card Holder: Prompt card holder to take card
+    Card Holder->ATM: Take card
+    ATM->ATM:Dispense cash
+    ATM->Card Holder: Prompt card holder to take cash
+    Card Holder->ATM: Take Cash
+    ATM->Bank: Debit Account
+    ATM->ATM: Wait for next customer
+  \stopwebsequence
+
+\stoptext

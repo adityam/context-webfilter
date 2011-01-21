@@ -1,0 +1,36 @@
+% A simple example of how to use the module.
+
+\usemodule[webfilter]
+
+\enabletrackers[thirddata.webfilter]
+\enabletrackers[resolvers.schemes]
+
+\definewebfilter
+  [UML]
+  [prefix={http://yuml.me/diagram/scruffy/\webfilterparameter{alternative}/},
+   suffix=.pdf,
+   alternative=usecase, %class activity usecase
+  ]
+
+\starttext
+
+\startUML
+    [Card Holder]-(Withdraw cash)
+    [Bank]-(Withdraw cash)
+    [Card Holder]-(View balance)
+    [Bank]-(View balance)
+    [Bank]-(Deposit cash)
+    [Card Holder]-(Deposit cash)
+\stopUML
+
+
+\startUML[alternative=class]
+  [Customer]+1->*[Order]
+  [Order]++1-items >*[Line Item]
+  [Order]-0..1>[Payment Method]
+\stopUML
+
+\stoptext
+
+
+                 

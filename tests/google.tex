@@ -1,0 +1,40 @@
+% Another simple example of how to use the module.
+% Google charts uses & as a separtor. This shows how to define a transformation
+% that uses & as a separator
+\usemodule[webfilter]
+
+\startluacode
+  userdata = userdata or {}
+  userdata.webfilter = userdata.webfilter or {}
+  function userdata.webfilter.google(name) 
+    return thirddata.webfilter.transform.default(name, "&")
+  end
+\stopluacode
+
+\defineexternalfigure[GoogleChart][width=\textwidth,maxheight=\textheight,method=png,frame=on]
+
+\definewebfilter
+  [GoogleCharts]
+  [prefix={http://chart.apis.google.com/chart?},
+   suffix={&chof=png},
+   figuresetup=GoogleChart,
+   transform=userdata.webfilter.google]
+
+\enabletrackers[third.externalfilter]
+\enabletrackers[resolvers.schemes]
+
+\starttext
+\startGoogleCharts
+  cht=bhg
+  chs=700x300
+  chd=t:100,50,115,80
+  chxt=x,y
+  chxl=1:|Python|Java|Ruby|.NET
+  chxr=0,0,120
+  chds=0,120
+  chco=4D89F9
+  chbh=35,0,15
+  chg=8.33,0,5,5
+\stopGoogleCharts
+
+\stoptext
